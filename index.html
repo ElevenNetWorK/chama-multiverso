@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chama Multiverso // Cloud Ecosystem & AI Atlas</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="theme-color" content="#ff6b35">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Atlas Cósmico de Ecossistemas, Agentes de IA e Sincronização em Nuvem - Chama Multiverso">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Supabase JS Client for Cloud Sync & Auth -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            rajdhani: ['Rajdhani', 'sans-serif'],
+          },
+          colors: {
+            flame: {
+              gold: '#ffd166',
+              orange: '#ff6b35',
+              fire: '#ff3b00',
+              crimson: '#d00000',
+              corona: '#ff9e00'
+            },
+            cyber: {
+              cyan: '#00f3ff',
+              magenta: '#ff0077',
+              violet: '#8a2be2',
+              emerald: '#06d6a0',
+              dark: '#02040a'
+            }
+          },
+          animation: {
+            'flame-pulse': 'flameGlow 3s infinite ease-in-out',
+            'flare-spin': 'flareSpin 20s linear infinite',
+            'cloud-pulse': 'cloudPulse 2s infinite ease-in-out',
+          },
+          keyframes: {
+            flameGlow: {
+              '0%, 100%': { filter: 'drop-shadow(0 0 6px #ff6b35) drop-shadow(0 0 14px rgba(255, 107, 53, 0.4))' },
+              '50%': { filter: 'drop-shadow(0 0 16px #ff9e00) drop-shadow(0 0 28px rgba(255, 59, 0, 0.7))' }
+            },
+            flareSpin: {
+              from: { transform: 'rotate(0deg)' },
+              to: { transform: 'rotate(360deg)' }
+            },
+            cloudPulse: {
+              '0%, 100%': { opacity: '0.6' },
+              '50%': { opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: rgba(3, 7, 18, 0.85); }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, rgba(255, 107, 53, 0.6), rgba(0, 243, 255, 0.5));
+      border-radius: 9999px;
+    }
+
+    .glass-flame {
+      background: rgba(10, 14, 28, 0.85);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 107, 53, 0.35);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7), inset 0 0 16px rgba(255, 107, 53, 0.08);
+    }
+
+    .glass-neon-drawer {
+      background: rgba(6, 10, 22, 0.95);
+      backdrop-filter: blur(24px);
+      border-left: 1px solid rgba(255, 107, 53, 0.45);
+      box-shadow: -10px 0 35px rgba(255, 59, 0, 0.15), inset 0 0 25px rgba(0, 243, 255, 0.04);
+    }
+
+    .hud-flame-corner {
+      position: relative;
+    }
+    .hud-flame-corner::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: -1px; width: 12px; height: 12px;
+      border-top: 2px solid #ff6b35;
+      border-left: 2px solid #ff6b35;
+    }
+    .hud-flame-corner::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; right: -1px; width: 12px; height: 12px;
+      border-bottom: 2px solid #00f3ff;
+      border-right: 2px solid #00f3ff;
+    }
+
+    .multiverse-bg {
+      background: radial-gradient(circle at 50% 50%, #0d122b 0%, #080916 55%, #020308 100%);
+    }
+
+    canvas {
+      cursor: grab;
+      touch-action: none;
+    }
+    canvas:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body class="h-full overflow-hidden select-none font-rajdhani text-base flex flex-col multiverse-bg">
+
+  <!-- TOP NAV HUD: CHAMA MULTIVERSO BRAND & CLOUD STATUS -->
+  <header class="z-20 w-full h-16 border-b border-flame-orange/30 glass-flame px-3 sm:px-6 flex items-center justify-between">
+    <div class="flex items-center space-x-2.5 sm:space-x-3.5">
+      <!-- Solar Core Flame Icon -->
+      <div class="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center rounded-xl border border-flame-orange/50 bg-gradient-to-br from-flame-fire/20 to-flame-orange/10 shadow-[0_0_15px_rgba(255,107,53,0.3)] cursor-pointer" onclick="resetCamera()">
+        <i class="fa-solid fa-fire-flame-curved text-flame-gold text-xl sm:text-2xl animate-flame-pulse"></i>
+        <span class="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-400"></span>
+        </span>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="font-orbitron font-black text-base sm:text-2xl tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-flame-gold via-flame-orange to-cyan-400">
+            CHAMA <span class="text-white drop-shadow-[0_0_12px_#ff6b35]">MULTIVERSO</span>
+          </h1>
+          <span class="hidden lg:inline-flex text-[9px] font-orbitron px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/30">CLOUD V2</span>
+        </div>
+        
+        <!-- Live Cloud Telemetry Pill -->
+        <div class="flex items-center gap-2">
+          <button onclick="openCloudModal()" id="cloudStatusBtn" class="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold text-slate-300 hover:text-white transition">
+            <span id="cloudStatusDot" class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#06d6a0]"></span>
+            <span id="cloudStatusLabel">Nuvem Pronta</span>
+            <i class="fa-solid fa-cloud-arrow-up text-[9px] text-cyan-400 ml-0.5"></i>
+          </button>
+          <span class="text-slate-600 hidden sm:inline">•</span>
+          <span id="currentUserLabel" class="hidden sm:inline text-[10px] text-slate-400">Sessão Local / Convidado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Constellation Filter Pills -->
+    <div class="hidden xl:flex items-center gap-1 bg-slate-950/70 p-1.5 rounded-xl border border-flame-orange/20" id="galaxyFilters">
+      <button onclick="setFilter('all')" class="galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg transition-all bg-gradient-to-r from-flame-orange to-flame-fire text-white shadow-md font-orbitron" data-filter="all">
+        TODAS
+      </button>
+      <button onclick="setFilter('Core Hub')" class="galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-flame-orange/15 transition-all font-orbitron" data-filter="Core Hub">
+        CORE HUB
+      </button>
+      <button onclick="setFilter('Agentes & IA')" class="galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-flame-orange/15 transition-all font-orbitron" data-filter="Agentes & IA">
+        AGENTES & IA
+      </button>
+      <button onclick="setFilter('Mídia & Vídeo')" class="galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-flame-orange/15 transition-all font-orbitron" data-filter="Mídia & Vídeo">
+        MÍDIA & VÍDEO
+      </button>
+      <button onclick="setFilter('Ferramentas 3D')" class="galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-flame-orange/15 transition-all font-orbitron" data-filter="Ferramentas 3D">
+        3D & ESPACIAL
+      </button>
+    </div>
+
+    <!-- Right Action Bar: Cloud Config, Backup Hub, Audio & Views -->
+    <div class="flex items-center gap-1.5 sm:gap-2.5">
+      
+      <!-- Cloud Settings / Auth Button -->
+      <button onclick="openCloudModal()" class="h-9 px-2.5 sm:px-3 rounded-xl border border-cyan-400/40 bg-cyan-950/40 hover:bg-cyan-900/40 text-cyan-300 flex items-center gap-1.5 transition text-xs shadow-md" title="Configurar Nuvem & Sincronização">
+        <i class="fa-solid fa-cloud text-xs"></i>
+        <span class="hidden sm:inline font-orbitron text-[11px]">Nuvem</span>
+      </button>
+
+      <!-- Backup & Restore Hub Button -->
+      <button onclick="openBackupModal()" class="h-9 px-2.5 sm:px-3 rounded-xl border border-flame-orange/40 bg-flame-orange/15 hover:bg-flame-orange/30 text-flame-gold flex items-center gap-1.5 transition text-xs shadow-md" title="Central de Backups (GitHub, Email, JSON)">
+        <i class="fa-solid fa-shield-halved text-xs"></i>
+        <span class="hidden sm:inline font-orbitron text-[11px]">Backups</span>
+      </button>
+
+      <!-- Audio SFX Toggle -->
+      <button id="audioToggleBtn" onclick="toggleAudio()" class="w-9 h-9 rounded-xl border border-flame-orange/30 bg-slate-900/60 hover:border-flame-gold text-flame-gold flex items-center justify-center transition text-xs shadow-md" title="Efeitos Sonoros Cósmicos">
+        <i id="audioIcon" class="fa-solid fa-volume-high"></i>
+      </button>
+
+      <!-- View Switcher (Map vs Grid) -->
+      <div class="bg-slate-900/80 p-1 rounded-xl border border-flame-orange/30 flex items-center text-xs">
+        <button id="viewMapBtn" onclick="switchView('map')" class="px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 bg-flame-orange/25 text-flame-gold font-semibold transition" title="Mapa Interativo">
+          <i class="fa-solid fa-satellite-dish text-xs"></i>
+          <span class="hidden md:inline">Mapa</span>
+        </button>
+        <button id="viewListBtn" onclick="switchView('list')" class="px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 text-slate-400 hover:text-flame-gold font-semibold transition" title="Grade de Sistemas">
+          <i class="fa-solid fa-table-cells-large text-xs"></i>
+          <span class="hidden md:inline">Grade</span>
+        </button>
+      </div>
+
+      <!-- Add New Star Button -->
+      <button onclick="openNewStarModal()" class="h-9 px-3 sm:px-3.5 rounded-xl bg-gradient-to-r from-flame-orange via-flame-fire to-amber-500 text-white font-orbitron font-bold text-xs tracking-wider uppercase transition shadow-lg hover:shadow-flame-orange/50 hover:scale-[1.02] active:scale-95 flex items-center gap-1.5">
+        <i class="fa-solid fa-plus text-xs"></i>
+        <span class="hidden md:inline">Nova Estrela</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN MULTIVERSE CONTAINER -->
+  <main class="relative flex-1 w-full h-[calc(100vh-4rem)] overflow-hidden">
+
+    <!-- CANVAS VIEW (Interactive Solar Flame Map) -->
+    <div id="cosmicView" class="relative w-full h-full">
+      <canvas id="galaxyCanvas" class="w-full h-full block"></canvas>
+
+      <!-- Map HUD Controls (Zoom / Recenter / Manual Sync) -->
+      <div class="absolute bottom-4 left-4 z-10 flex flex-col gap-2">
+        <div class="glass-flame p-1.5 sm:p-2 rounded-xl flex items-center gap-1 border border-flame-orange/30 text-flame-gold text-xs shadow-xl">
+          <button onclick="zoomMap(1.2)" class="w-8 h-8 rounded-lg hover:bg-flame-orange/20 flex items-center justify-center font-bold text-sm transition" title="Aproximar Visão">+</button>
+          <button onclick="zoomMap(0.8)" class="w-8 h-8 rounded-lg hover:bg-flame-orange/20 flex items-center justify-center font-bold text-sm transition" title="Afastar Visão">-</button>
+          <div class="h-4 w-px bg-flame-orange/30 mx-1"></div>
+          <button onclick="resetCamera()" class="px-2.5 h-8 rounded-lg hover:bg-flame-orange/20 flex items-center gap-1.5 transition font-orbitron text-[11px]" title="Centralizar Órbita">
+            <i class="fa-solid fa-bullseye"></i> <span class="hidden sm:inline">Centro</span>
+          </button>
+          <button onclick="triggerCloudSync()" class="px-2.5 h-8 rounded-lg hover:bg-cyan-500/20 text-cyan-300 flex items-center gap-1.5 transition font-orbitron text-[11px]" title="Sincronizar com a Nuvem">
+            <i class="fa-solid fa-arrows-rotate" id="syncSpinIcon"></i> <span class="hidden sm:inline">Sincronizar</span>
+          </button>
+        </div>
+        <div class="text-[10px] sm:text-[11px] text-flame-gold/80 tracking-wider font-semibold pl-1 drop-shadow-sm flex items-center gap-1.5">
+          <i class="fa-solid fa-mobile-screen text-cyan-400"></i> Toque e arraste para explorar • Pinch-to-zoom em telas móveis
+        </div>
+      </div>
+
+      <!-- Live Constellation Telemetry HUD -->
+      <div class="hidden lg:block absolute top-5 left-5 z-10 glass-flame rounded-2xl p-4 border border-flame-orange/35 max-w-xs pointer-events-none">
+        <div class="flex items-center justify-between text-xs font-orbitron font-bold text-flame-gold pb-2 border-b border-flame-orange/20 mb-2.5">
+          <span class="flex items-center gap-1.5">
+            <i class="fa-solid fa-sun text-flame-fire animate-spin" style="animation-duration: 25s;"></i>
+            NÚCLEO MULTIVERSO
+          </span>
+          <span class="text-[10px] text-cyan-400 font-mono flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping"></span>
+            AO VIVO
+          </span>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="bg-slate-950/80 p-2 rounded-lg border border-flame-orange/20">
+            <div class="text-flame-gold font-orbitron font-bold text-base" id="statTotalNodes">0</div>
+            <div class="text-[10px] uppercase text-slate-400">Sistemas</div>
+          </div>
+          <div class="bg-slate-950/80 p-2 rounded-lg border border-cyan-400/20">
+            <div class="text-cyan-400 font-orbitron font-bold text-base" id="statCompletedTasks">0</div>
+            <div class="text-[10px] uppercase text-slate-400">Tarefas OK</div>
+          </div>
+          <div class="bg-slate-950/80 p-2 rounded-lg border border-flame-fire/20">
+            <div class="text-flame-orange font-orbitron font-bold text-base" id="statPendingBugs">0</div>
+            <div class="text-[10px] uppercase text-slate-400">Correções</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Constellation Legend -->
+      <div class="hidden md:flex absolute bottom-4 right-4 z-10 glass-flame px-4 py-2 rounded-xl border border-flame-orange/30 text-xs gap-4 items-center">
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-flame-orange shadow-[0_0_8px_#ff6b35]"></span>
+          <span class="text-slate-300 font-medium">Core Hub</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f3ff]"></span>
+          <span class="text-slate-300 font-medium">Agentes & IA</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-fuchsia-400 shadow-[0_0_8px_#ff0077]"></span>
+          <span class="text-slate-300 font-medium">Mídia & Vídeo</span>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#06d6a0]"></span>
+          <span class="text-slate-300 font-medium">3D / Espacial</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- GRID / MATRIX VIEW -->
+    <div id="listView" class="hidden absolute inset-0 z-10 p-4 sm:p-8 overflow-y-auto bg-slate-950/95 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-flame-orange/25">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-orbitron font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-flame-gold via-flame-orange to-cyan-400">
+              CATÁLOGO DE SISTEMAS // NUVEM
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-300">Todas as estrelas sincronizadas na sua infraestrutura de nuvem.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <div class="relative w-full sm:w-auto">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+              <input type="text" id="searchInput" oninput="renderListView()" placeholder="Buscar por sistema, IA ou tecnologia..." class="bg-slate-900 border border-flame-orange/30 rounded-xl pl-9 pr-4 py-2 text-sm text-flame-gold placeholder-slate-500 focus:outline-none focus:border-flame-orange w-full sm:w-80">
+            </div>
+          </div>
+        </div>
+
+        <!-- Systems Grid Container -->
+        <div id="systemsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Populated via Javascript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- HOLOGRAPHIC INSPECTOR DRAWER -->
+    <div id="drawerBackdrop" onclick="closeDrawer()" class="hidden fixed inset-0 z-40 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300"></div>
+
+    <aside id="inspectorDrawer" class="fixed top-0 right-0 z-50 h-full w-full sm:w-[540px] md:w-[620px] glass-neon-drawer p-5 sm:p-7 flex flex-col transform translate-x-full transition-transform duration-300 ease-out shadow-2xl overflow-y-auto">
+      
+      <!-- Drawer Header -->
+      <div class="flex items-start justify-between pb-4 border-b border-flame-orange/30">
+        <div class="space-y-1.5 flex-1 pr-3">
+          <div class="flex items-center gap-2 flex-wrap">
+            <span id="dGalaxyBadge" class="text-[10px] font-orbitron font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-flame-orange/40 bg-flame-orange/15 text-flame-gold">
+              Galáxia
+            </span>
+            <span id="dStatusBadge" class="text-[10px] font-orbitron font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-cyan-400/40 bg-cyan-950 text-cyan-300">
+              Status
+            </span>
+            <span id="dCloudSyncedBadge" class="text-[9px] font-orbitron px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+              <i class="fa-solid fa-cloud-check text-[9px]"></i> Sincronizado
+            </span>
+          </div>
+          <h2 id="dName" class="text-2xl sm:text-3xl font-orbitron font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-flame-gold via-flame-orange to-cyan-300">
+            Nome do Sistema
+          </h2>
+          <p id="dDescription" class="text-xs sm:text-sm text-slate-300 leading-relaxed pt-1">
+            Descrição do sistema.
+          </p>
+        </div>
+        <button onclick="closeDrawer()" class="text-slate-400 hover:text-flame-gold p-2 rounded-xl border border-slate-700 hover:border-flame-orange/50 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Metrics Ribbon -->
+      <div class="grid grid-cols-3 gap-2.5 py-4 border-b border-flame-orange/20 text-xs text-center">
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-flame-orange/20 flex flex-col">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Versão Atual</span>
+          <span id="dVersion" class="font-orbitron font-bold text-flame-gold text-sm">v1.0.0</span>
+        </div>
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-flame-orange/20 flex flex-col">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Data Inicial</span>
+          <span id="dStartDate" class="font-orbitron font-semibold text-cyan-300 text-sm">Outubro 2026</span>
+        </div>
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-flame-orange/20 flex flex-col">
+          <span class="text-[10px] uppercase font-bold text-slate-400">Roadmap</span>
+          <span id="dProgressPercent" class="font-orbitron font-bold text-emerald-400 text-sm">0%</span>
+        </div>
+      </div>
+
+      <!-- Drawer Content Sections -->
+      <div class="py-4 space-y-6 flex-1">
+        
+        <!-- MATRIZ DE INTELIGÊNCIA ARTIFICIAL E TECH STACK -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-orbitron font-bold text-flame-gold tracking-wider uppercase flex items-center gap-2">
+              <i class="fa-solid fa-atom text-cyan-400 animate-spin" style="animation-duration: 10s;"></i> Matriz de IAs & Tecnologias
+            </h3>
+            <span class="text-[11px] text-slate-400 font-semibold" id="dTechCount">0 Integradas</span>
+          </div>
+          
+          <div id="dStackList" class="space-y-2.5">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+
+        <!-- O QUE PRECISA SER CONSTRUÍDO (ROADMAP) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-orbitron font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-2">
+              <i class="fa-solid fa-hammer text-emerald-300"></i> O Que Precisa Ser Construído
+            </h3>
+            <span class="text-[11px] text-slate-400" id="dRoadmapCounter">0/0</span>
+          </div>
+
+          <!-- Add Roadmap Item Inline -->
+          <div class="flex gap-2">
+            <input type="text" id="newRoadmapInput" placeholder="Nova funcionalidade, tela ou algoritmo..." class="flex-1 bg-slate-900 border border-emerald-500/30 rounded-xl px-3 py-1.5 text-xs text-emerald-200 placeholder-slate-500 focus:outline-none focus:border-emerald-400">
+            <button onclick="addRoadmapItem()" class="px-3 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-orbitron font-bold text-xs rounded-xl transition flex items-center gap-1 shadow-md">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
+
+          <!-- Checklist Container -->
+          <div id="dRoadmapList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- O QUE PRECISA SER CORRIGIDO (BUGS & DÉBITOS TÉCNICOS) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-orbitron font-bold text-flame-orange tracking-wider uppercase flex items-center gap-2">
+              <i class="fa-solid fa-triangle-exclamation text-flame-fire"></i> O Que Precisa Ser Corrigido
+            </h3>
+            <span class="text-[11px] text-slate-400" id="dBugCounter">0 pendentes</span>
+          </div>
+
+          <!-- Add Bug Inline -->
+          <div class="flex gap-2">
+            <input type="text" id="newBugInput" placeholder="Bug, lentidão ou refatoração..." class="flex-1 bg-slate-900 border border-flame-orange/30 rounded-xl px-3 py-1.5 text-xs text-flame-gold placeholder-slate-500 focus:outline-none focus:border-flame-orange">
+            <button onclick="addBugItem()" class="px-3 py-1.5 bg-gradient-to-r from-flame-orange to-flame-fire hover:from-flame-gold hover:to-flame-orange text-slate-950 font-orbitron font-bold text-xs rounded-xl transition flex items-center gap-1 shadow-md">
+              <i class="fa-solid fa-bug"></i> Registrar
+            </button>
+          </div>
+
+          <!-- Bug list -->
+          <div id="dBugList" class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Drawer Bottom Actions -->
+      <div class="pt-4 border-t border-flame-orange/25 flex items-center justify-between">
+        <button onclick="deleteCurrentSystem()" class="text-rose-400 hover:text-rose-300 text-xs font-semibold px-3 py-2 rounded-xl border border-rose-500/30 hover:bg-rose-500/10 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-trash-can"></i> Desintegrar Estrela
+        </button>
+        <button onclick="closeDrawer()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-flame-orange to-flame-fire hover:brightness-110 text-white font-orbitron font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-flame-orange/20">
+          Fechar Inspeção
+        </button>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- MODAL: PAINEL DE NUVEM & AUTENTICAÇÃO -->
+  <div id="cloudModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="glass-flame hud-flame-corner rounded-2xl max-w-xl w-full p-6 sm:p-7 space-y-5 border border-cyan-400/40 shadow-2xl max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-cyan-400/25 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-400/40 flex items-center justify-center text-cyan-300">
+            <i class="fa-solid fa-cloud-arrow-up text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-orbitron font-black text-lg text-cyan-300">NUVEM MULTIVERSO // SYNC</h3>
+            <p class="text-xs text-slate-300">Sincronize entre seu computador, celular e outras IAs.</p>
+          </div>
+        </div>
+        <button onclick="closeCloudModal()" class="text-slate-400 hover:text-cyan-300">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Cloud Status Box -->
+      <div class="p-3.5 rounded-xl border border-cyan-400/30 bg-slate-900/80 flex items-center justify-between text-xs">
+        <div class="space-y-0.5">
+          <div class="font-orbitron font-bold text-cyan-300 flex items-center gap-1.5">
+            <span id="modalCloudIndicator" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span id="modalCloudTitle">Status da Conexão</span>
+          </div>
+          <p id="modalCloudDesc" class="text-slate-400 text-[11px]">Seus dados estão protegidos e prontos para sincronização.</p>
+        </div>
+        <button onclick="triggerCloudSync()" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 hover:bg-cyan-500/30 font-orbitron font-bold text-[11px] transition">
+          Sync Agora
+        </button>
+      </div>
+
+      <!-- Cloud Backend Credentials (Supabase / Nuvem) -->
+      <div class="space-y-3 pt-1">
+        <div class="flex items-center justify-between">
+          <label class="block font-orbitron font-bold text-xs text-flame-gold uppercase tracking-wide">
+            Configuração do Backend Supabase (Opcional)
+          </label>
+          <span class="text-[10px] text-slate-400">Armazenamento global permanente</span>
+        </div>
+        <p class="text-[11px] text-slate-400 leading-normal">
+          Para sincronizar em tempo real entre celular e computador sem limites, insira as credenciais do seu projeto gratuito do <strong>Supabase</strong>. Caso prefira não configurar agora, o sistema continua funcionando perfeitamente em modo local com backup em nuvem por arquivo/email/GitHub.
+        </p>
+
+        <div class="space-y-2 text-xs">
+          <div>
+            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">Supabase Project URL</label>
+            <input type="text" id="cfgSupabaseUrl" placeholder="https://seu-projeto.supabase.co" class="w-full bg-slate-900 border border-cyan-400/30 rounded-xl px-3 py-2 text-cyan-200 placeholder-slate-600 focus:outline-none focus:border-cyan-400 font-mono text-xs">
+          </div>
+          <div>
+            <label class="text-[11px] text-slate-300 font-semibold mb-1 block">Supabase Anon Key</label>
+            <input type="password" id="cfgSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full bg-slate-900 border border-cyan-400/30 rounded-xl px-3 py-2 text-cyan-200 placeholder-slate-600 focus:outline-none focus:border-cyan-400 font-mono text-xs">
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <button onclick="saveCloudConfig()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-teal-500 text-slate-950 font-orbitron font-bold text-xs uppercase transition shadow hover:brightness-110">
+            Salvar Conexão de Nuvem
+          </button>
+          <button onclick="clearCloudConfig()" class="text-xs text-slate-400 hover:text-rose-400">
+            Desconectar
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Auth Simulation / Session -->
+      <div class="p-3.5 rounded-xl border border-flame-orange/30 bg-slate-900/60 space-y-2 text-xs">
+        <label class="block font-orbitron font-bold text-flame-gold uppercase">Identidade do Comandante</label>
+        <div class="flex gap-2">
+          <input type="text" id="userDisplayNameInput" placeholder="Seu nome ou callsign (ex: Comandante Silva)" class="flex-1 bg-slate-950 border border-flame-orange/25 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-flame-orange">
+          <button onclick="saveUserProfile()" class="px-3.5 py-1.5 rounded-xl bg-flame-orange/20 text-flame-gold border border-flame-orange/40 hover:bg-flame-orange/30 font-orbitron font-semibold text-xs">
+            Atualizar
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeCloudModal()" class="px-5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-orbitron text-xs">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: CENTRAL DE BACKUPS CÓSMICOS (GITHUB, EMAIL, JSON) -->
+  <div id="backupModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+    <div class="glass-flame hud-flame-corner rounded-2xl max-w-2xl w-full p-6 sm:p-7 space-y-5 border border-flame-orange/50 shadow-2xl max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-flame-orange/25 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-flame-orange/15 border border-flame-orange/40 flex items-center justify-center text-flame-gold">
+            <i class="fa-solid fa-shield-halved text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-orbitron font-black text-lg text-flame-gold">CENTRAL DE BACKUP & EXPORTAÇÃO</h3>
+            <p class="text-xs text-slate-300">Proteja seu ecossistema contra perdas em múltiplos canais.</p>
+          </div>
+        </div>
+        <button onclick="closeBackupModal()" class="text-slate-400 hover:text-flame-gold">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+        
+        <!-- 1. Instant JSON Snapshot -->
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-flame-orange/30 flex flex-col justify-between space-y-3">
+          <div class="space-y-1">
+            <div class="font-orbitron font-bold text-flame-gold flex items-center gap-2">
+              <i class="fa-solid fa-file-code text-cyan-400"></i> Snapshot JSON Seguro
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Baixe um arquivo integral contendo todas as estrelas, tarefas do roadmap, bugs e matrizes de IA com carimbo de data/hora.
+            </p>
+          </div>
+          <button onclick="downloadBackupJSON()" class="w-full py-2 rounded-xl bg-gradient-to-r from-flame-orange to-flame-fire text-white font-orbitron font-bold text-xs uppercase transition shadow hover:brightness-110 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download"></i> Baixar Snapshot (.json)
+          </button>
+        </div>
+
+        <!-- 2. Restore JSON Backup -->
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-cyan-400/30 flex flex-col justify-between space-y-3">
+          <div class="space-y-1">
+            <div class="font-orbitron font-bold text-cyan-300 flex items-center gap-2">
+              <i class="fa-solid fa-upload text-flame-gold"></i> Restaurar / Mesclar
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed">
+              Carregue um arquivo JSON gerado em outro computador ou celular para sincronizar e mesclar as constelações.
+            </p>
+          </div>
+          <label class="w-full py-2 rounded-xl border border-cyan-400/40 bg-cyan-950/50 hover:bg-cyan-900/50 text-cyan-300 font-orbitron font-bold text-xs uppercase transition flex items-center justify-center gap-2 cursor-pointer text-center">
+            <i class="fa-solid fa-folder-open"></i> Selecionar Arquivo
+            <input type="file" id="restoreFileInput" accept=".json" onchange="handleRestoreFile(event)" class="hidden">
+          </label>
+        </div>
+
+        <!-- 3. GitHub Gist / Webhook Integration -->
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 md:col-span-2 space-y-3">
+          <div class="flex items-center justify-between">
+            <div class="font-orbitron font-bold text-white flex items-center gap-2">
+              <i class="fa-brands fa-github text-base text-flame-gold"></i> Sincronização GitHub (Gist / Repositório)
+            </div>
+            <span class="text-[10px] text-slate-400">Controle de Versão</span>
+          </div>
+          <p class="text-slate-400 text-[11px]">
+            Gere uma cópia formatada pronta para commit no seu repositório ou cole seu Personal Access Token do GitHub para exportar automaticamente para um Gist secreto.
+          </p>
+          <div class="flex gap-2">
+            <button onclick="copyUniverseToClipboard()" class="flex-1 py-2 rounded-xl bg-slate-950 border border-slate-700 hover:border-flame-orange/40 text-slate-200 font-orbitron font-semibold text-xs flex items-center justify-center gap-2 transition">
+              <i class="fa-regular fa-clipboard"></i> Copiar Código JSON
+            </button>
+            <button onclick="openGitHubGistHelper()" class="flex-1 py-2 rounded-xl bg-slate-950 border border-cyan-400/30 hover:border-cyan-400 text-cyan-300 font-orbitron font-semibold text-xs flex items-center justify-center gap-2 transition">
+              <i class="fa-brands fa-github"></i> Criar Gist no GitHub
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Email Dispatch Backup -->
+        <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 md:col-span-2 space-y-2">
+          <div class="font-orbitron font-bold text-emerald-400 flex items-center gap-2">
+            <i class="fa-solid fa-envelope text-flame-gold"></i> Envio de Snapshot por E-mail
+          </div>
+          <p class="text-slate-400 text-[11px]">
+            Dispare um relatório estruturado com todos os sistemas e tarefas pendentes para o seu e-mail como registro de segurança offline.
+          </p>
+          <div class="flex gap-2">
+            <input type="email" id="backupEmailInput" placeholder="seu-email@dominio.com" class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-emerald-400">
+            <button onclick="sendBackupEmail()" class="px-4 py-1.5 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/30 font-orbitron font-bold text-xs flex items-center gap-1.5 transition">
+              <i class="fa-solid fa-paper-plane"></i> Enviar
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="pt-3 border-t border-flame-orange/20 flex justify-end">
+        <button onclick="closeBackupModal()" class="px-5 py-2 rounded-xl bg-slate-900 border border-slate-700 text-slate-300 hover:text-white font-orbitron text-xs">
+          Fechar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA ESTRELA / NOVO SISTEMA -->
+  <div id="newStarModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="glass-flame hud-flame-corner rounded-2xl max-w-2xl w-full p-6 sm:p-7 space-y-4 border border-flame-orange/50 shadow-2xl max-h-[92vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between border-b border-flame-orange/25 pb-3">
+        <div class="flex items-center gap-2.5">
+          <i class="fa-solid fa-fire text-flame-gold text-2xl animate-flame-pulse"></i>
+          <div>
+            <h3 class="font-orbitron font-extrabold text-lg sm:text-xl text-flame-gold">FUNDIR NOVA ESTRELA // CHAMA MULTIVERSO</h3>
+            <p class="text-xs text-slate-300">Ancore um novo projeto estelar na malha cósmica.</p>
+          </div>
+        </div>
+        <button onclick="closeNewStarModal()" class="text-slate-400 hover:text-flame-gold">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="createSystemForm" onsubmit="handleCreateSystem(event)" class="space-y-4 text-xs">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Nome do Sistema *</label>
+            <input type="text" id="formName" required placeholder="Ex: Rota Mágica, Agente Quântico..." class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-flame-gold focus:outline-none focus:border-flame-orange">
+          </div>
+          <div>
+            <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Galáxia / Categoria *</label>
+            <select id="formGalaxy" class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-flame-gold focus:outline-none focus:border-flame-orange">
+              <option value="Core Hub">Core Hub (Ecossistema Central)</option>
+              <option value="Agentes & IA">Agentes & IA (Modelos Autônomos)</option>
+              <option value="Mídia & Vídeo">Mídia & Vídeo (Audiovisual & Criação)</option>
+              <option value="Ferramentas 3D">Ferramentas 3D & Espaciais</option>
+              <option value="Automação">Automação & Orquestração</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Versão Inicial</label>
+            <input type="text" id="formVersion" placeholder="Ex: v0.1.0-alpha" value="v0.1.0-alpha" class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-flame-gold focus:outline-none focus:border-flame-orange">
+          </div>
+          <div>
+            <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Data de Início</label>
+            <input type="text" id="formStartDate" placeholder="Ex: Outubro 2026" class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-flame-gold focus:outline-none focus:border-flame-orange">
+          </div>
+          <div>
+            <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Status Operacional</label>
+            <select id="formStatus" class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-flame-gold focus:outline-none focus:border-flame-orange">
+              <option value="Em Desenvolvimento">Em Desenvolvimento</option>
+              <option value="Ideação & Protótipo">Ideação & Protótipo</option>
+              <option value="Beta Fechado">Beta Fechado</option>
+              <option value="Produção Ativa">Produção Ativa</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-orbitron font-bold text-flame-gold mb-1 uppercase tracking-wide">Missão / Propósito do Sistema</label>
+          <textarea id="formDescription" rows="2" placeholder="Qual o impacto e a função deste aplicativo no Chama Multiverso?" class="w-full bg-slate-900 border border-flame-orange/30 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:border-flame-orange"></textarea>
+        </div>
+
+        <!-- Predefined AI & Tool Roles Selector -->
+        <div class="bg-slate-950/70 p-3.5 rounded-xl border border-flame-orange/20 space-y-2">
+          <label class="block font-orbitron font-bold text-flame-gold uppercase tracking-wide">
+            Papel das IAs e Tecnologias
+          </label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="Gemini" checked class="accent-flame-orange">
+              <span class="text-xs font-semibold text-flame-gold">Gemini 3 (Supervisor)</span>
+            </label>
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="Google Antigravity" checked class="accent-flame-orange">
+              <span class="text-xs font-semibold text-cyan-300">Google Antigravity</span>
+            </label>
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="Python" checked class="accent-flame-orange">
+              <span class="text-xs font-semibold text-slate-200">Python / FastAPI</span>
+            </label>
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="ChatGPT" class="accent-flame-orange">
+              <span class="text-xs font-semibold text-emerald-300">ChatGPT (Crítico/Copy)</span>
+            </label>
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="Supabase" class="accent-flame-orange">
+              <span class="text-xs font-semibold text-emerald-400">Supabase (Database)</span>
+            </label>
+            <label class="flex items-center gap-2 bg-slate-900 p-2 rounded-lg border border-flame-orange/20 cursor-pointer hover:border-flame-orange">
+              <input type="checkbox" name="tools" value="Three.js" class="accent-flame-orange">
+              <span class="text-xs font-semibold text-fuchsia-300">Three.js / Canvas</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-flame-orange/20">
+          <button type="button" onclick="closeNewStarModal()" class="px-4 py-2 rounded-xl border border-slate-700 hover:border-flame-orange/50 text-slate-300 hover:text-white transition">
+            Cancelar
+          </button>
+          <button type="submit" class="px-6 py-2 rounded-xl bg-gradient-to-r from-flame-orange via-flame-fire to-amber-500 text-white font-orbitron font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-flame-orange/30 hover:scale-[1.02]">
+            Fundir Estrela
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICATION TOAST -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none glass-flame border border-flame-orange/50 rounded-xl px-4 py-3 flex items-center gap-3 text-xs shadow-2xl">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+    <span id="toastMsg" class="font-semibold text-slate-100">Transmissão estelar</span>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION CORE -->
+  <script>
+    /* =========================================================================
+       1. SYNTHESIZED WEB AUDIO API (Cosmic Chimes & Feedback)
+       ========================================================================= */
+    let audioCtx = null;
+    let audioEnabled = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('audioIcon');
+      if (audioEnabled) {
+        icon.className = 'fa-solid fa-volume-high';
+        playTone(523.25, 0.08, 'sine');
+        showToast('Áudio cósmico ativado!', 'info');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-500';
+        showToast('Áudio cósmico silenciado.', 'info');
+      }
+    }
+
+    function playTone(freq, duration, type = 'sine', gainVal = 0.08) {
+      if (!audioEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        gain.gain.setValueAtTime(gainVal, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playStarSelectSound() {
+      if (!audioEnabled) return;
+      playTone(440, 0.1, 'sine', 0.06);
+      setTimeout(() => playTone(659.25, 0.18, 'sine', 0.05), 60);
+      setTimeout(() => playTone(880, 0.22, 'triangle', 0.04), 120);
+    }
+
+    function playTaskToggleSound() {
+      if (!audioEnabled) return;
+      playTone(784, 0.09, 'sine', 0.05);
+      setTimeout(() => playTone(1046.5, 0.14, 'sine', 0.04), 50);
+    }
+
+    /* =========================================================================
+       2. DATABASE, LOCAL STORAGE & CLOUD CONFIGURATION
+       ========================================================================= */
+    const STORAGE_KEY = 'chama_multiverso_data_v2';
+    const CLOUD_CONFIG_KEY = 'chama_multiverso_cloud_cfg';
+    const PROFILE_KEY = 'chama_multiverso_user_profile';
+
+    let supabaseClient = null;
+    let cloudSynced = false;
+
+    const DEFAULT_SYSTEMS = [
+      {
+        id: 'rota-magica',
+        name: 'Rota Mágica',
+        galaxy: 'Core Hub',
+        version: 'v0.8.4-beta',
+        startDate: 'Agosto 2026',
+        status: 'Em Desenvolvimento',
+        description: 'Plataforma inteligente de roteirização automática, mapas visuais interativos e geração dinâmica de itinerários turísticos e culturais.',
+        x: 0,
+        y: 0,
+        radius: 20,
+        color: '#ff6b35',
+        connections: ['chama-viva', 'studio-ia', 'agente-antigravity'],
+        tools: [
+          {
+            name: 'Gemini 3 Flash',
+            type: 'IA / Raciocínio & Supervisor',
+            role: 'Arquiteto de Rotas: Estrutura os itinerários por horários, otimiza distâncias e gera narrativas cativantes para cada parada recomendada.'
+          },
+          {
+            name: 'Google Antigravity',
+            type: 'Ambiente Agêntico & Execução',
+            role: 'Orquestrador de Código e Agentes: Responsável por compilar as rotinas autônomas, testes de regressão contínuos e pipelines de integração.'
+          },
+          {
+            name: 'Python / FastAPI',
+            type: 'Engine de Backend',
+            role: 'Motor de Roteamento: Cálculo geoespacial, tratamento de matrizes de distância e APIs de resposta ultra veloz.'
+          },
+          {
+            name: 'Supabase',
+            type: 'Banco de Dados & Autenticação',
+            role: 'Cofre de Dados: PostGIS para consultas geográficas, histórico de viagens e persistência dos perfis de viajantes.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Renderizar mapa interativo em camadas vetoriais de alta fidelidade', done: true },
+          { id: 2, text: 'Conectar streaming contínuo de itinerários com o modelo Gemini', done: true },
+          { id: 3, text: 'Exportação para PDF interativo com QR codes de navegação offline', done: false },
+          { id: 4, text: 'Módulo de estimativa dinâmica de custos e combustível por trajeto', done: false }
+        ],
+        bugs: [
+          { id: 1, text: 'Ajustar debounce na busca de cidades durante digitação rápida', fixed: true },
+          { id: 2, text: 'Timeout intermitente quando a rota excede 14 waypoints simultâneos', fixed: false }
+        ]
+      },
+      {
+        id: 'chama-viva',
+        name: 'Chama Viva Hub',
+        galaxy: 'Core Hub',
+        version: 'v1.2.0',
+        startDate: 'Julho 2026',
+        status: 'Produção Ativa',
+        description: 'Portal agregador do ecossistema cósmico, acervo multimídia de meditações, transmissões comunitárias e gestão de membros.',
+        x: -210,
+        y: -90,
+        radius: 17,
+        color: '#ffd166',
+        connections: ['rota-magica', 'organizador-3d'],
+        tools: [
+          {
+            name: 'Google Antigravity',
+            type: 'Orquestrador Agêntico',
+            role: 'Agente de Boas-Vindas & Moderação: Categoriza tópicos da comunidade e conecta membros a recursos adequados.'
+          },
+          {
+            name: 'Python / FastAPI',
+            type: 'Microserviços & Webhooks',
+            role: 'Automação de Assinaturas: Integração imediata com gateways de pagamento e emissão de credenciais seguras.'
+          },
+          {
+            name: 'Supabase',
+            type: 'PostgreSQL Realtime',
+            role: 'Feed ao vivo e sincronização instantânea de mensagens comunitárias.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Feed ao vivo com reações em tempo real', done: true },
+          { id: 2, text: 'PWA com cache local de meditações para uso offline', done: true },
+          { id: 3, text: 'Chatbot de mentoria personalizada com histórico de contexto', done: false }
+        ],
+        bugs: [
+          { id: 1, text: 'Atualização de avatar de perfil requer recarregamento manual', fixed: true }
+        ]
+      },
+      {
+        id: 'studio-ia',
+        name: 'StudioIA Criativo',
+        galaxy: 'Mídia & Vídeo',
+        version: 'v0.5.2-alpha',
+        startDate: 'Setembro 2026',
+        status: 'Em Desenvolvimento',
+        description: 'Estúdio autônomo para roteirização cinematográfica, geração de vídeos curtos verticais, locução neural e edição programática.',
+        x: 190,
+        y: -130,
+        radius: 15,
+        color: '#ff0077',
+        connections: ['rota-magica', 'sala-vazia'],
+        tools: [
+          {
+            name: 'ChatGPT / GPT-4o',
+            type: 'IA / Redação & Copywriting',
+            role: 'Crítico de Retenção & Roteirista: Desenvolve os ganchos emocionais iniciais e revisa tom de voz para máxima retenção de audiência.'
+          },
+          {
+            name: 'Gemini 3 Flash',
+            type: 'IA / Análise Multimodal',
+            role: 'Diretor de Fotografia IA: Interpreta imagens de referência e decompõe roteiros em prompts de vídeo precisos.'
+          },
+          {
+            name: 'FFmpeg & Python',
+            type: 'Engine de Renderização',
+            role: 'Pipeline de Composição: Monta clipes, mescla trilha sonora ambiente e aplica legendas sincronizadas palavra a palavra.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Transcrição e legendagem automática com Whisper', done: true },
+          { id: 2, text: 'Gerador em lote de capas de vídeo com estilos personalizáveis', done: false },
+          { id: 3, text: 'Publicação direta via API no TikTok, Reels e YouTube Shorts', done: false }
+        ],
+        bugs: [
+          { id: 1, text: 'Distorção de pitch na síntese de voz quando o texto possui termos em outros idiomas', fixed: false }
+        ]
+      },
+      {
+        id: 'sala-vazia',
+        name: 'Sala Vazia',
+        galaxy: 'Ferramentas 3D',
+        version: 'v0.4.0-alpha',
+        startDate: 'Outubro 2026',
+        status: 'Ideação & Protótipo',
+        description: 'Ambiente espacial 3D minimalista para descompressão mental, anotações flutuantes e foco profundo com áudio generativo relaxante.',
+        x: 240,
+        y: 110,
+        radius: 14,
+        color: '#06d6a0',
+        connections: ['studio-ia', 'organizador-3d'],
+        tools: [
+          {
+            name: 'Three.js / WebGL',
+            type: 'Motor Gráfico 3D',
+            role: 'Ambiente Visual Espacial: Gera a sala virtual geométrica, reflexos em tempo real e névoa cósmica suave.'
+          },
+          {
+            name: 'Web Audio API / Tone.js',
+            type: 'Síntese Sonora Procedural',
+            role: 'Gerador de Frequências Binaurais: Cria paisagens sonoras harmônicas que evoluem sem repetição e sem arquivos pesados.'
+          },
+          {
+            name: 'Gemini',
+            type: 'IA / Facilitador Filosófico',
+            role: 'Espelho Socrático: Conduz o usuário por reflexões guiadas para dissolver bloqueios criativos.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Shaders volumétricos de luz suave', done: true },
+          { id: 2, text: 'Módulo de gravador de voz com transcrição imediata para orbes 3D', done: false },
+          { id: 3, text: 'Compatibilidade com headsets WebXR imersivos', done: false }
+        ],
+        bugs: [
+          { id: 1, text: 'Leve quebra de iluminação ao alternar abas do navegador em segundo plano', fixed: false }
+        ]
+      },
+      {
+        id: 'organizador-3d',
+        name: 'Organizador 3D',
+        galaxy: 'Ferramentas 3D',
+        version: 'v0.6.1-beta',
+        startDate: 'Agosto 2026',
+        status: 'Em Desenvolvimento',
+        description: 'Explorador espacial de arquivos e conceitos onde documentos orbitam seu projeto central de acordo com sua relevância temática.',
+        x: -110,
+        y: 170,
+        radius: 15,
+        color: '#8a2be2',
+        connections: ['chama-viva', 'sala-vazia', 'agente-antigravity'],
+        tools: [
+          {
+            name: 'Python',
+            type: 'Filesystem Parser',
+            role: 'Indexador de Disco: Analisa metadados, detecta redundâncias e exporta grafo hierárquico estruturado em JSON.'
+          },
+          {
+            name: 'Gemini 3 Flash',
+            type: 'IA / Classificação Semântica',
+            role: 'Organizador Cognitivo: Compreende o conteúdo dos arquivos e agrupa-os por sinergia temática real, superando pastas convencionais.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Física gravitacional onde pastas maiores exercem atração visual', done: true },
+          { id: 2, text: 'Comandos de atalho ultrarrápidos para navegação tridimensional', done: false }
+        ],
+        bugs: [
+          { id: 1, text: 'Oscilação visual ao colidir dois nós de tamanho e massa idênticos', fixed: false }
+        ]
+      },
+      {
+        id: 'agente-antigravity',
+        name: 'Agente Antigravity Core',
+        galaxy: 'Agentes & IA',
+        version: 'v1.0.0-rc2',
+        startDate: 'Setembro 2026',
+        status: 'Produção Ativa',
+        description: 'Nave-mãe de automação que conecta os repositórios, gerencia deploys, executa testes e monitora a estabilidade de toda a Chama Multiverso.',
+        x: 60,
+        y: 180,
+        radius: 16,
+        color: '#00f3ff',
+        connections: ['rota-magica', 'organizador-3d'],
+        tools: [
+          {
+            name: 'Google Antigravity',
+            type: 'Automação Agêntica de Código',
+            role: 'Executor Principal: Escreve, refatora e valida códigos com agentes autônomos em ambiente sandbox integrado.'
+          },
+          {
+            name: 'Python Scripts',
+            type: 'Rotinas & Sincronização',
+            role: 'Sentinela do Multiverso: Rotinas agendadas para backup, verificação de rotas quebradas e alertas em tempo real.'
+          }
+        ],
+        roadmap: [
+          { id: 1, text: 'Disparo de webhooks e alertas para canal privado de comando', done: true },
+          { id: 2, text: 'Auditoria preditiva que detecta dependências desatualizadas', done: false }
+        ],
+        bugs: []
+      }
+    ];
+
+    let systems = [];
+    let currentFilter = 'all';
+    let currentView = 'map';
+    let selectedSystemId = null;
+
+    function initCloudClient() {
+      try {
+        const rawCfg = localStorage.getItem(CLOUD_CONFIG_KEY);
+        if (rawCfg) {
+          const cfg = JSON.parse(rawCfg);
+          if (cfg.supabaseUrl && cfg.supabaseKey && window.supabase) {
+            supabaseClient = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseKey);
+            document.getElementById('cfgSupabaseUrl').value = cfg.supabaseUrl;
+            document.getElementById('cfgSupabaseKey').value = cfg.supabaseKey;
+            setCloudStatus('connected', 'Supabase Conectado');
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Configuração de nuvem não inicializada:', e);
+      }
+      setCloudStatus('local', 'Cache Local Ativo');
+    }
+
+    function setCloudStatus(state, label) {
+      const dot = document.getElementById('cloudStatusDot');
+      const text = document.getElementById('cloudStatusLabel');
+      const modalDot = document.getElementById('modalCloudIndicator');
+      const modalTitle = document.getElementById('modalCloudTitle');
+
+      if (state === 'connected') {
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#06d6a0]';
+        modalDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        text.innerText = label || 'Nuvem Conectada';
+        modalTitle.innerText = 'Sincronização em Nuvem Ativa (Supabase)';
+      } else if (state === 'syncing') {
+        dot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-ping';
+        modalDot.className = 'w-2 h-2 rounded-full bg-cyan-400 animate-pulse';
+        text.innerText = 'Sincronizando...';
+        modalTitle.innerText = 'Sincronizando Dados com a Nuvem...';
+      } else {
+        dot.className = 'w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#ffd166]';
+        modalDot.className = 'w-2 h-2 rounded-full bg-amber-400';
+        text.innerText = label || 'Cache Local Ativo';
+        modalTitle.innerText = 'Operando em Armazenamento Local Seguro';
+      }
+    }
+
+    function loadSystems() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          systems = JSON.parse(stored);
+        } else {
+          systems = JSON.parse(JSON.stringify(DEFAULT_SYSTEMS));
+          saveSystems(false);
+        }
+      } catch (e) {
+        console.error('Erro ao ler dados da Chama Multiverso:', e);
+        systems = JSON.parse(JSON.stringify(DEFAULT_SYSTEMS));
+      }
+      updateStats();
+      renderListView();
+      loadUserProfile();
+    }
+
+    async function saveSystems(shouldSyncCloud = true) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(systems));
+        updateStats();
+        renderListView();
+
+        if (shouldSyncCloud && supabaseClient) {
+          triggerCloudSync(true);
+        }
+      } catch (e) {
+        console.error('Erro ao salvar no Multiverso:', e);
+        showToast('Falha na sincronização do armazenamento local!', 'error');
+      }
+    }
+
+    async function triggerCloudSync(silent = false) {
+      const spinIcon = document.getElementById('syncSpinIcon');
+      if (spinIcon) spinIcon.classList.add('fa-spin');
+      setCloudStatus('syncing', 'Sincronizando...');
+
+      if (supabaseClient) {
+        try {
+          // Attempt push to Supabase table 'multiverse_systems'
+          const { error } = await supabaseClient
+            .from('multiverse_systems')
+            .upsert({ id: 'current_universe', payload: systems, updated_at: new Date() });
+
+          if (!error) {
+            setCloudStatus('connected', 'Sincronizado na Nuvem');
+            if (!silent) showToast('Sincronização com Supabase concluída!', 'success');
+            playTone(880, 0.12, 'sine', 0.05);
+          } else {
+            console.warn('Tabela multiverse_systems ausente ou erro Supabase:', error.message);
+            setCloudStatus('local', 'Cache Local Protegido');
+            if (!silent) showToast('Dados salvos no cache local do dispositivo.', 'info');
+          }
+        } catch (err) {
+          setCloudStatus('local', 'Cache Local Protegido');
+        }
+      } else {
+        // Fallback smooth simulation for local devices
+        setTimeout(() => {
+          setCloudStatus('local', 'Cache Local Protegido');
+          if (!silent) showToast('Ecossistema verificado e salvo localmente!', 'info');
+          playTone(660, 0.09, 'sine', 0.04);
+        }, 400);
+      }
+
+      setTimeout(() => {
+        if (spinIcon) spinIcon.classList.remove('fa-spin');
+      }, 600);
+    }
+
+    function saveCloudConfig() {
+      const url = document.getElementById('cfgSupabaseUrl').value.trim();
+      const key = document.getElementById('cfgSupabaseKey').value.trim();
+
+      if (!url || !key) {
+        showToast('Preencha a URL e Anon Key do Supabase.', 'error');
+        return;
+      }
+
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify({ supabaseUrl: url, supabaseKey: key }));
+      initCloudClient();
+      showToast('Configuração de nuvem salva com sucesso!', 'success');
+      triggerCloudSync();
+      closeCloudModal();
+    }
+
+    function clearCloudConfig() {
+      localStorage.removeItem(CLOUD_CONFIG_KEY);
+      supabaseClient = null;
+      document.getElementById('cfgSupabaseUrl').value = '';
+      document.getElementById('cfgSupabaseKey').value = '';
+      setCloudStatus('local', 'Cache Local Ativo');
+      showToast('Desconectado da nuvem. Operando em modo local seguro.', 'info');
+    }
+
+    function loadUserProfile() {
+      const saved = localStorage.getItem(PROFILE_KEY);
+      if (saved) {
+        const p = JSON.parse(saved);
+        document.getElementById('currentUserLabel').innerText = `Comandante: ${p.name || 'Silva'}`;
+        document.getElementById('userDisplayNameInput').value = p.name || '';
+      }
+    }
+
+    function saveUserProfile() {
+      const name = document.getElementById('userDisplayNameInput').value.trim();
+      if (!name) return;
+      localStorage.setItem(PROFILE_KEY, JSON.stringify({ name: name, updated_at: new Date() }));
+      loadUserProfile();
+      showToast('Identidade atualizada no Multiverso!', 'success');
+      playTone(600, 0.08, 'sine');
+    }
+
+    /* =========================================================================
+       3. BACKUP & EXPORT HUB (JSON, GITHUB, EMAIL)
+       ========================================================================= */
+    function downloadBackupJSON() {
+      try {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(systems, null, 2));
+        const downloadAnchor = document.createElement('a');
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        downloadAnchor.setAttribute("href", dataStr);
+        downloadAnchor.setAttribute("download", `chama-multiverso-backup-${timestamp}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+        showToast('Backup JSON exportado com sucesso!', 'success');
+        playTone(720, 0.15, 'sine');
+      } catch (e) {
+        showToast('Erro ao exportar backup JSON.', 'error');
+      }
+    }
+
+    function handleRestoreFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].name) {
+            systems = parsed;
+            saveSystems(true);
+            showToast(`Multiverso restaurado! ${systems.length} estrelas carregadas.`, 'success');
+            playTone(880, 0.2, 'triangle');
+            closeBackupModal();
+          } else {
+            showToast('Arquivo de backup inválido ou incompatível.', 'error');
+          }
+        } catch (err) {
+          showToast('Erro ao processar o arquivo JSON.', 'error');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function copyUniverseToClipboard() {
+      const raw = JSON.stringify(systems, null, 2);
+      const tempInput = document.createElement('textarea');
+      tempInput.value = raw;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      try {
+        document.execCommand('copy');
+        showToast('Código JSON cósmico copiado para a área de transferência!', 'success');
+        playTone(650, 0.1, 'sine');
+      } catch (err) {
+        showToast('Falha ao copiar automaticamente.', 'error');
+      }
+      document.body.removeChild(tempInput);
+    }
+
+    function openGitHubGistHelper() {
+      copyUniverseToClipboard();
+      showToast('Redirecionando para criação do Gist no GitHub...', 'info');
+      setTimeout(() => {
+        window.open('https://gist.github.com/', '_blank');
+      }, 1000);
+    }
+
+    function sendBackupEmail() {
+      const email = document.getElementById('backupEmailInput').value.trim();
+      if (!email || !email.includes('@')) {
+        showToast('Por favor insira um e-mail válido.', 'error');
+        return;
+      }
+
+      const totalDone = systems.reduce((acc, s) => acc + (s.roadmap?.filter(r => r.done).length || 0), 0);
+      const totalBugs = systems.reduce((acc, s) => acc + (s.bugs?.filter(b => !b.fixed).length || 0), 0);
+      
+      const subject = encodeURIComponent(`[Chama Multiverso] Snapshot do Ecossistema - ${new Date().toLocaleDateString('pt-BR')}`);
+      let bodyText = `RELATÓRIO DO ECOSSISTEMA CHAMA MULTIVERSO\nData: ${new Date().toLocaleString('pt-BR')}\n\n`;
+      bodyText += `Total de Sistemas: ${systems.length}\nTarefas Concluídas: ${totalDone}\nBugs Pendentes: ${totalBugs}\n\n`;
+      bodyText += `RESUMO DOS SISTEMAS:\n`;
+      
+      systems.forEach((s, idx) => {
+        bodyText += `\n${idx + 1}. ${s.name} (${s.galaxy}) - Versão: ${s.version} [${s.status}]\n`;
+        bodyText += `   Propósito: ${s.description}\n`;
+        bodyText += `   IAs & Stack: ${(s.tools || []).map(t => t.name).join(', ')}\n`;
+        bodyText += `   Roadmap: ${(s.roadmap || []).filter(r => r.done).length}/${(s.roadmap || []).length} concluídas\n`;
+      });
+
+      bodyText += `\n\nJSON COMPACTADO PARA RESTAURAÇÃO:\n${JSON.stringify(systems)}`;
+      
+      const mailtoLink = `mailto:${email}?subject=${subject}&body=${encodeURIComponent(bodyText)}`;
+      window.location.href = mailtoLink;
+      showToast('Cliente de e-mail acionado com snapshot estruturado!', 'success');
+      playTone(550, 0.12, 'sine');
+    }
+
+    function openCloudModal() {
+      document.getElementById('cloudModal').classList.remove('hidden');
+      playTone(540, 0.08, 'sine');
+    }
+
+    function closeCloudModal() {
+      document.getElementById('cloudModal').classList.add('hidden');
+    }
+
+    function openBackupModal() {
+      document.getElementById('backupModal').classList.remove('hidden');
+      playTone(540, 0.08, 'sine');
+    }
+
+    function closeBackupModal() {
+      document.getElementById('backupModal').classList.add('hidden');
+    }
+
+    /* =========================================================================
+       4. INTERACTIVE 2D SOLAR FLAME CANVAS ENGINE
+       ========================================================================= */
+    const canvas = document.getElementById('galaxyCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let camera = { x: 0, y: 0, zoom: 1 };
+    let isDragging = false;
+    let dragStart = { x: 0, y: 0 };
+    let cameraStart = { x: 0, y: 0 };
+    let hasMoved = false;
+
+    // Background Star Particles
+    const bgStars = [];
+    const NUM_BG_STARS = 220;
+
+    function initBackgroundStars() {
+      bgStars.length = 0;
+      for (let i = 0; i < NUM_BG_STARS; i++) {
+        bgStars.push({
+          x: (Math.random() - 0.5) * 2800,
+          y: (Math.random() - 0.5) * 2800,
+          size: Math.random() * 2.2 + 0.5,
+          alpha: Math.random() * 0.7 + 0.3,
+          color: Math.random() > 0.4 ? '#ffd166' : (Math.random() > 0.5 ? '#ff6b35' : '#00f3ff')
+        });
+      }
+    }
+
+    function resizeCanvas() {
+      const container = document.getElementById('cosmicView');
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = container.clientWidth * dpr;
+      canvas.height = container.clientHeight * dpr;
+      canvas.style.width = `${container.clientWidth}px`;
+      canvas.style.height = `${container.clientHeight}px`;
+      ctx.scale(dpr, dpr);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+
+    // Mouse & Touch Pan/Zoom
+    canvas.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      hasMoved = false;
+      dragStart = { x: e.clientX, y: e.clientY };
+      cameraStart = { x: camera.x, y: camera.y };
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStart.x;
+      const dy = e.clientY - dragStart.y;
+      if (Math.hypot(dx, dy) > 4) hasMoved = true;
+      camera.x = cameraStart.x + dx;
+      camera.y = cameraStart.y + dy;
+    });
+
+    window.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      if (!hasMoved) {
+        handleCanvasClick(e.clientX, e.clientY);
+      }
+    });
+
+    // Touch Support for Mobile
+    let touchDistance = 0;
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isDragging = true;
+        hasMoved = false;
+        dragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        cameraStart = { x: camera.x, y: camera.y };
+      } else if (e.touches.length === 2) {
+        isDragging = false;
+        touchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1 && isDragging) {
+        const dx = e.touches[0].clientX - dragStart.x;
+        const dy = e.touches[0].clientY - dragStart.y;
+        if (Math.hypot(dx, dy) > 5) hasMoved = true;
+        camera.x = cameraStart.x + dx;
+        camera.y = cameraStart.y + dy;
+      } else if (e.touches.length === 2) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const factor = dist / (touchDistance || dist);
+        camera.zoom = Math.min(Math.max(camera.zoom * factor, 0.4), 2.5);
+        touchDistance = dist;
+      }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+      if (isDragging && !hasMoved && e.changedTouches.length > 0) {
+        handleCanvasClick(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+      }
+      isDragging = false;
+    });
+
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.12 : 0.88;
+      camera.zoom = Math.min(Math.max(camera.zoom * zoomFactor, 0.4), 2.6);
+    }, { passive: false });
+
+    function zoomMap(factor) {
+      camera.zoom = Math.min(Math.max(camera.zoom * factor, 0.4), 2.6);
+      playTone(550 * factor, 0.05, 'sine', 0.03);
+    }
+
+    function resetCamera() {
+      camera.x = 0;
+      camera.y = 0;
+      camera.zoom = 1;
+      playTone(520, 0.08, 'sine', 0.04);
+    }
+
+    function screenToWorld(sx, sy) {
+      const container = document.getElementById('cosmicView');
+      const cx = container.clientWidth / 2;
+      const cy = container.clientHeight / 2;
+      const wx = (sx - cx - camera.x) / camera.zoom;
+      const wy = (sy - cy - camera.y) / camera.zoom;
+      return { x: wx, y: wy };
+    }
+
+    function handleCanvasClick(screenX, screenY) {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = screenX - rect.left;
+      const clickY = screenY - rect.top;
+      const worldPos = screenToWorld(clickX, clickY);
+
+      const activeList = getFilteredSystems();
+      for (const sys of activeList) {
+        const dist = Math.hypot(worldPos.x - sys.x, worldPos.y - sys.y);
+        if (dist <= sys.radius + 18) {
+          playStarSelectSound();
+          openDrawer(sys.id);
+          return;
+        }
+      }
+    }
+
+    function getFilteredSystems() {
+      if (currentFilter === 'all') return systems;
+      return systems.filter(s => s.galaxy.toLowerCase() === currentFilter.toLowerCase());
+    }
+
+    /* =========================================================================
+       5. ANIMATION & FLAME RENDERING
+       ========================================================================= */
+    let animationClock = 0;
+
+    function renderMultiverse() {
+      const container = document.getElementById('cosmicView');
+      const w = container.clientWidth;
+      const h = container.clientHeight;
+
+      animationClock += 0.024;
+      ctx.clearRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.translate(w / 2 + camera.x, h / 2 + camera.y);
+      ctx.scale(camera.zoom, camera.zoom);
+
+      // 1. Draw Solar Flame & Nebula Corona
+      drawMultiverseNebulae();
+
+      // 2. Draw Twinkling Background Stars
+      drawBackgroundStars();
+
+      // 3. Draw Pulsing Solar Energy Beams
+      drawSolarBeams();
+
+      // 4. Draw Stars & Corona Flares
+      drawStars();
+
+      ctx.restore();
+      requestAnimationFrame(renderMultiverse);
+    }
+
+    function drawMultiverseNebulae() {
+      // Central Solar Fire Nebula
+      const solarGrad = ctx.createRadialGradient(0, 0, 40, 0, 0, 500);
+      solarGrad.addColorStop(0, 'rgba(255, 107, 53, 0.12)');
+      solarGrad.addColorStop(0.35, 'rgba(255, 158, 0, 0.06)');
+      solarGrad.addColorStop(0.7, 'rgba(138, 43, 226, 0.03)');
+      solarGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = solarGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, 500, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Cyan Secondary Nebula
+      const cyanGrad = ctx.createRadialGradient(-180, 140, 30, -180, 140, 360);
+      cyanGrad.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+      cyanGrad.addColorStop(0.6, 'rgba(0, 243, 255, 0.02)');
+      cyanGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = cyanGrad;
+      ctx.beginPath();
+      ctx.arc(-180, 140, 360, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawBackgroundStars() {
+      for (const star of bgStars) {
+        const twinkle = Math.sin(animationClock * 2.5 + star.x) * 0.35 + 0.65;
+        ctx.fillStyle = star.color;
+        ctx.globalAlpha = star.alpha * twinkle;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+    }
+
+    function drawSolarBeams() {
+      const activeList = getFilteredSystems();
+      const connectedPairs = new Set();
+
+      for (const sys of activeList) {
+        if (!sys.connections) continue;
+        for (const targetId of sys.connections) {
+          const target = systems.find(s => s.id === targetId);
+          if (!target) continue;
+
+          const pairKey = [sys.id, target.id].sort().join('::');
+          if (connectedPairs.has(pairKey)) continue;
+          connectedPairs.add(pairKey);
+
+          // Baseline Solar Energy Filament
+          ctx.beginPath();
+          ctx.moveTo(sys.x, sys.y);
+          ctx.lineTo(target.x, target.y);
+          ctx.strokeStyle = 'rgba(255, 107, 53, 0.22)';
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+
+          // High-Energy Pulsing Packet
+          const pulseProgress = (animationClock * 0.9 + (sys.x + target.y) * 0.003) % 1;
+          const px = sys.x + (target.x - sys.x) * pulseProgress;
+          const py = sys.y + (target.y - sys.y) * pulseProgress;
+
+          const packetGrad = ctx.createRadialGradient(px, py, 0, px, py, 7);
+          packetGrad.addColorStop(0, '#ffffff');
+          packetGrad.addColorStop(0.4, '#ffd166');
+          packetGrad.addColorStop(0.8, '#ff6b35');
+          packetGrad.addColorStop(1, 'rgba(255, 107, 53, 0)');
+          ctx.fillStyle = packetGrad;
+          ctx.beginPath();
+          ctx.arc(px, py, 7, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function drawStars() {
+      const activeList = getFilteredSystems();
+
+      for (const sys of activeList) {
+        const isSelected = sys.id === selectedSystemId;
+        const baseColor = sys.color || '#ff6b35';
+        const flamePulse = Math.sin(animationClock * 3.5 + sys.radius) * 4;
+
+        // 1. Solar Corona Outer Glow
+        const coronaRadius = sys.radius * 2.4 + flamePulse + (isSelected ? 6 : 0);
+        const coronaGrad = ctx.createRadialGradient(sys.x, sys.y, sys.radius * 0.4, sys.x, sys.y, coronaRadius);
+        coronaGrad.addColorStop(0, baseColor);
+        coronaGrad.addColorStop(0.4, `${baseColor}66`);
+        coronaGrad.addColorStop(0.8, 'rgba(255, 107, 53, 0.15)');
+        coronaGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = coronaGrad;
+        ctx.beginPath();
+        ctx.arc(sys.x, sys.y, coronaRadius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Solar Flare Ring
+        ctx.beginPath();
+        ctx.arc(sys.x, sys.y, sys.radius + 9 + (isSelected ? 4 : 0), 0, Math.PI * 2);
+        ctx.strokeStyle = isSelected ? '#ffd166' : 'rgba(255, 158, 0, 0.4)';
+        ctx.lineWidth = isSelected ? 2.5 : 1.2;
+        ctx.setLineDash([5, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // 3. Stellar Solid Core
+        ctx.beginPath();
+        ctx.arc(sys.x, sys.y, sys.radius, 0, Math.PI * 2);
+        ctx.fillStyle = baseColor;
+        ctx.fill();
+
+        // White-hot solar nucleus
+        ctx.beginPath();
+        ctx.arc(sys.x, sys.y, sys.radius * 0.45, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
+        ctx.fill();
+
+        // 4. Holographic Text Labels
+        ctx.font = 'bold 12px Orbitron, sans-serif';
+        ctx.fillStyle = isSelected ? '#ffd166' : '#f8fafc';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(sys.name.toUpperCase(), sys.x, sys.y + sys.radius + 14);
+
+        // Status Subtitle
+        ctx.font = '10px Rajdhani, sans-serif';
+        ctx.fillStyle = sys.status === 'Produção Ativa' ? '#06d6a0' : (sys.status === 'Em Desenvolvimento' ? '#00f3ff' : '#ffb703');
+        ctx.fillText(`${sys.version} • ${sys.status}`, sys.x, sys.y + sys.radius + 30);
+      }
+    }
+
+    /* =========================================================================
+       6. HOLOGRAPHIC INSPECTOR DRAWER
+       ========================================================================= */
+    function openDrawer(systemId) {
+      selectedSystemId = systemId;
+      const sys = systems.find(s => s.id === systemId);
+      if (!sys) return;
+
+      document.getElementById('dName').innerText = sys.name;
+      document.getElementById('dGalaxyBadge').innerText = sys.galaxy;
+      document.getElementById('dStatusBadge').innerText = sys.status;
+      document.getElementById('dDescription').innerText = sys.description;
+      document.getElementById('dVersion').innerText = sys.version || 'v1.0.0';
+      document.getElementById('dStartDate').innerText = sys.startDate || 'Não informada';
+
+      const badge = document.getElementById('dStatusBadge');
+      if (sys.status === 'Produção Ativa') {
+        badge.className = 'text-[10px] font-orbitron font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-emerald-400/40 bg-emerald-950 text-emerald-300';
+      } else if (sys.status === 'Em Desenvolvimento') {
+        badge.className = 'text-[10px] font-orbitron font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-flame-orange/50 bg-flame-orange/20 text-flame-gold';
+      } else {
+        badge.className = 'text-[10px] font-orbitron font-extrabold uppercase px-2.5 py-0.5 rounded-full border border-amber-400/40 bg-amber-950 text-amber-300';
+      }
+
+      renderStackList(sys);
+      renderRoadmapList(sys);
+      renderBugList(sys);
+      updateDrawerProgress(sys);
+
+      document.getElementById('drawerBackdrop').classList.remove('hidden');
+      document.getElementById('inspectorDrawer').classList.remove('translate-x-full');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerBackdrop').classList.add('hidden');
+      document.getElementById('inspectorDrawer').classList.add('translate-x-full');
+      selectedSystemId = null;
+    }
+
+    function renderStackList(sys) {
+      const container = document.getElementById('dStackList');
+      container.innerHTML = '';
+
+      const tools = sys.tools || [];
+      document.getElementById('dTechCount').innerText = `${tools.length} Integradas`;
+
+      if (tools.length === 0) {
+        container.innerHTML = `
+          <div class="p-3 text-center text-xs text-slate-500 rounded-xl border border-dashed border-slate-800">
+            Nenhuma IA ou ferramenta cadastrada neste sistema ainda.
+          </div>
+        `;
+        return;
+      }
+
+      tools.forEach((tool) => {
+        const isAI = /gemini|chatgpt|gpt|antigravity|claude|ia|inteligencia/i.test(tool.name + ' ' + tool.type);
+        const icon = isAI ? 'fa-brain text-flame-gold' : 'fa-code-branch text-cyan-400';
+
+        const item = document.createElement('div');
+        item.className = 'bg-slate-950/80 rounded-xl p-3 border border-flame-orange/25 hover:border-flame-gold transition';
+        item.innerHTML = `
+          <div class="flex items-center justify-between pb-1.5 border-b border-flame-orange/15 mb-1.5">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid ${icon} text-sm"></i>
+              <span class="font-orbitron font-bold text-xs text-flame-gold">${escapeHtml(tool.name)}</span>
+            </div>
+            <span class="text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-flame-orange/20 text-flame-gold border border-flame-orange/30">
+              ${escapeHtml(tool.type || 'Stack')}
+            </span>
+          </div>
+          <p class="text-xs text-slate-300 leading-snug">
+            ${escapeHtml(tool.role || 'Papel e função no sistema')}
+          </p>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function renderRoadmapList(sys) {
+      const container = document.getElementById('dRoadmapList');
+      container.innerHTML = '';
+      const list = sys.roadmap || [];
+
+      const doneCount = list.filter(i => i.done).length;
+      document.getElementById('dRoadmapCounter').innerText = `${doneCount}/${list.length} concluídas`;
+
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2">Nenhuma meta cadastrada no momento.</p>`;
+        return;
+      }
+
+      list.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between p-2 rounded-lg text-xs transition border ${item.done ? 'bg-emerald-950/20 border-emerald-500/20 text-slate-400' : 'bg-slate-900/60 border-flame-orange/20 text-slate-200 hover:border-emerald-500/40'}`;
+        row.innerHTML = `
+          <label class="flex items-center gap-2 flex-1 cursor-pointer">
+            <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleRoadmapItem(${item.id})" class="accent-emerald-400 rounded cursor-pointer">
+            <span class="${item.done ? 'line-through text-emerald-400/70' : ''}">${escapeHtml(item.text)}</span>
+          </label>
+          <button onclick="removeRoadmapItem(${item.id})" class="text-slate-500 hover:text-rose-400 p-1 transition ml-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function renderBugList(sys) {
+      const container = document.getElementById('dBugList');
+      container.innerHTML = '';
+      const list = sys.bugs || [];
+
+      const pendingCount = list.filter(i => !i.fixed).length;
+      document.getElementById('dBugCounter').innerText = `${pendingCount} pendentes`;
+
+      if (list.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2">Nenhum bug reportado. Sistema em ressonância perfeita!</p>`;
+        return;
+      }
+
+      list.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = `flex items-center justify-between p-2 rounded-lg text-xs transition border ${item.fixed ? 'bg-slate-900/30 border-slate-800 text-slate-500' : 'bg-flame-orange/15 border-flame-orange/40 text-flame-gold hover:border-flame-gold'}`;
+        row.innerHTML = `
+          <label class="flex items-center gap-2 flex-1 cursor-pointer">
+            <input type="checkbox" ${item.fixed ? 'checked' : ''} onchange="toggleBugItem(${item.id})" class="accent-flame-orange rounded cursor-pointer">
+            <span class="${item.fixed ? 'line-through text-slate-500' : ''}">${escapeHtml(item.text)}</span>
+          </label>
+          <button onclick="removeBugItem(${item.id})" class="text-slate-500 hover:text-rose-400 p-1 transition ml-2">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        `;
+        container.appendChild(row);
+      });
+    }
+
+    function updateDrawerProgress(sys) {
+      const totalRoadmap = (sys.roadmap || []).length;
+      const doneRoadmap = (sys.roadmap || []).filter(i => i.done).length;
+      const percent = totalRoadmap > 0 ? Math.round((doneRoadmap / totalRoadmap) * 100) : 0;
+      document.getElementById('dProgressPercent').innerText = `${percent}%`;
+    }
+
+    function toggleRoadmapItem(itemId) {
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+      const item = sys.roadmap.find(i => i.id === itemId);
+      if (item) {
+        item.done = !item.done;
+        playTaskToggleSound();
+        saveSystems();
+        renderRoadmapList(sys);
+        updateDrawerProgress(sys);
+      }
+    }
+
+    function addRoadmapItem() {
+      const input = document.getElementById('newRoadmapInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+
+      if (!sys.roadmap) sys.roadmap = [];
+      sys.roadmap.push({ id: Date.now(), text: text, done: false });
+      input.value = '';
+      playTone(700, 0.1, 'sine');
+      saveSystems();
+      renderRoadmapList(sys);
+      updateDrawerProgress(sys);
+      showToast('Meta adicionada à estrela e sincronizada!', 'success');
+    }
+
+    function removeRoadmapItem(itemId) {
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+      sys.roadmap = sys.roadmap.filter(i => i.id !== itemId);
+      saveSystems();
+      renderRoadmapList(sys);
+      updateDrawerProgress(sys);
+    }
+
+    function toggleBugItem(itemId) {
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+      const item = sys.bugs.find(i => i.id === itemId);
+      if (item) {
+        item.fixed = !item.fixed;
+        playTone(450, 0.1, 'triangle');
+        saveSystems();
+        renderBugList(sys);
+      }
+    }
+
+    function addBugItem() {
+      const input = document.getElementById('newBugInput');
+      const text = input.value.trim();
+      if (!text) return;
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+
+      if (!sys.bugs) sys.bugs = [];
+      sys.bugs.push({ id: Date.now(), text: text, fixed: false });
+      input.value = '';
+      playTone(350, 0.12, 'sawtooth', 0.05);
+      saveSystems();
+      renderBugList(sys);
+      showToast('Ponto de correção registrado!', 'info');
+    }
+
+    function removeBugItem(itemId) {
+      const sys = systems.find(s => s.id === selectedSystemId);
+      if (!sys) return;
+      sys.bugs = sys.bugs.filter(i => i.id !== itemId);
+      saveSystems();
+      renderBugList(sys);
+    }
+
+    function deleteCurrentSystem() {
+      if (!selectedSystemId) return;
+      showCustomConfirm(
+        'Desintegrar Estrela?',
+        'Deseja colapsar este sistema estelar permanentemente de todo o Multiverso?',
+        () => {
+          systems = systems.filter(s => s.id !== selectedSystemId);
+          systems.forEach(s => {
+            if (s.connections) s.connections = s.connections.filter(c => c !== selectedSystemId);
+          });
+          saveSystems();
+          closeDrawer();
+          playTone(220, 0.3, 'sawtooth', 0.08);
+          showToast('Estrela colapsada com sucesso.', 'info');
+        }
+      );
+    }
+
+    /* =========================================================================
+       7. NOVA ESTRELA MODAL & CRIAÇÃO
+       ========================================================================= */
+    function openNewStarModal() {
+      document.getElementById('formStartDate').value = 'Outubro 2026';
+      document.getElementById('newStarModal').classList.remove('hidden');
+      playTone(480, 0.08, 'sine');
+    }
+
+    function closeNewStarModal() {
+      document.getElementById('newStarModal').classList.add('hidden');
+      document.getElementById('createSystemForm').reset();
+    }
+
+    function handleCreateSystem(e) {
+      e.preventDefault();
+      const name = document.getElementById('formName').value.trim();
+      if (!name) return;
+
+      const galaxy = document.getElementById('formGalaxy').value;
+      const version = document.getElementById('formVersion').value.trim() || 'v0.1.0-alpha';
+      const startDate = document.getElementById('formStartDate').value.trim() || 'Outubro 2026';
+      const status = document.getElementById('formStatus').value;
+      const description = document.getElementById('formDescription').value.trim() || 'Novo nó ativo na Chama Multiverso.';
+
+      let color = '#ff6b35';
+      if (galaxy === 'Mídia & Vídeo') color = '#ff0077';
+      else if (galaxy === 'Ferramentas 3D') color = '#06d6a0';
+      else if (galaxy === 'Agentes & IA') color = '#00f3ff';
+      else if (galaxy === 'Core Hub') color = '#ffd166';
+
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 160 + Math.random() * 120;
+      const newX = Math.cos(angle) * dist;
+      const newY = Math.sin(angle) * dist;
+
+      const checkedBoxes = Array.from(document.querySelectorAll('input[name="tools"]:checked'));
+      const tools = checkedBoxes.map(cb => {
+        const val = cb.value;
+        if (val === 'Gemini') {
+          return { name: 'Gemini 3 Flash', type: 'Arquiteto de IA & Supervisor', role: 'Supervisão de lógica, geração de prompts de alta precisão e estruturação analítica.' };
+        } else if (val === 'Google Antigravity') {
+          return { name: 'Google Antigravity', type: 'Executor Agêntico', role: 'Desenvolvimento e execução autônoma de fluxos de código e automação de rotinas.' };
+        } else if (val === 'Python') {
+          return { name: 'Python / FastAPI', type: 'Engine de Backend', role: 'Endpoints de processamento veloz, manipulação de arquivos e regras de negócio.' };
+        } else if (val === 'ChatGPT') {
+          return { name: 'ChatGPT', type: 'Crítico & Roteirista', role: 'Refinamento de roteiros, copies, contrapropostas lógicas e auditoria de ideias.' };
+        } else if (val === 'Supabase') {
+          return { name: 'Supabase', type: 'Banco de Dados', role: 'Persistência estruturada, realtime subscriptions e autenticação.' };
+        } else {
+          return { name: 'Three.js / 3D', type: 'Frontend Espacial', role: 'Interface cósmica 3D interativa com WebGL e shaders em tempo real.' };
+        }
+      });
+
+      const coreSystem = systems.find(s => s.galaxy === 'Core Hub') || systems[0];
+      const connections = coreSystem ? [coreSystem.id] : [];
+      const newId = name.toLowerCase().replace(/[^a-z0-9]/g, '-') + '-' + Math.floor(Math.random() * 1000);
+
+      const newSystem = {
+        id: newId,
+        name: name,
+        galaxy: galaxy,
+        version: version,
+        startDate: startDate,
+        status: status,
+        description: description,
+        x: Math.round(newX),
+        y: Math.round(newY),
+        radius: 16,
+        color: color,
+        connections: connections,
+        tools: tools,
+        roadmap: [
+          { id: Date.now() + 1, text: 'Definir arquitetura básica do MVP', done: false },
+          { id: Date.now() + 2, text: 'Conectar aos módulos de IA', done: false }
+        ],
+        bugs: []
+      };
+
+      systems.push(newSystem);
+      saveSystems();
+      closeNewStarModal();
+      showToast(`Estrela "${name}" fundida ao Multiverso!`, 'success');
+      playTone(650, 0.25, 'triangle');
+
+      camera.x = -newSystem.x * camera.zoom;
+      camera.y = -newSystem.y * camera.zoom;
+
+      openDrawer(newSystem.id);
+    }
+
+    /* =========================================================================
+       8. GRID VIEW RENDERING
+       ========================================================================= */
+    function renderListView() {
+      const grid = document.getElementById('systemsGrid');
+      grid.innerHTML = '';
+
+      const query = (document.getElementById('searchInput')?.value || '').toLowerCase();
+      let list = getFilteredSystems();
+
+      if (query) {
+        list = list.filter(s => 
+          s.name.toLowerCase().includes(query) ||
+          s.description.toLowerCase().includes(query) ||
+          (s.tools || []).some(t => t.name.toLowerCase().includes(query) || t.role.toLowerCase().includes(query))
+        );
+      }
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-500 font-orbitron">
+            <i class="fa-solid fa-satellite text-3xl mb-3 text-flame-orange/40"></i>
+            <p>NENHUM SISTEMA ESTELAR ENCONTRADO NESSA COORDENADA.</p>
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(sys => {
+        const totalRoadmap = (sys.roadmap || []).length;
+        const doneRoadmap = (sys.roadmap || []).filter(i => i.done).length;
+        const percent = totalRoadmap > 0 ? Math.round((doneRoadmap / totalRoadmap) * 100) : 0;
+        const pendingBugs = (sys.bugs || []).filter(b => !b.fixed).length;
+
+        const card = document.createElement('div');
+        card.className = 'glass-flame rounded-2xl p-5 border border-flame-orange/30 hover:border-flame-gold transition-all hover:scale-[1.01] flex flex-col justify-between shadow-xl cursor-pointer group';
+        card.onclick = () => {
+          playStarSelectSound();
+          openDrawer(sys.id);
+        };
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-orbitron font-extrabold px-2.5 py-0.5 rounded-full border border-flame-orange/40 bg-flame-orange/15 text-flame-gold uppercase">
+                ${escapeHtml(sys.galaxy)}
+              </span>
+              <span class="text-xs font-orbitron font-bold text-slate-400">${escapeHtml(sys.version)}</span>
+            </div>
+            
+            <div>
+              <h3 class="text-xl font-orbitron font-bold text-white group-hover:text-flame-gold transition flex items-center gap-2">
+                <span class="inline-block w-2.5 h-2.5 rounded-full" style="background-color: ${sys.color}; box-shadow: 0 0 10px ${sys.color}"></span>
+                ${escapeHtml(sys.name)}
+              </h3>
+              <p class="text-xs text-slate-300 line-clamp-2 mt-1 leading-relaxed">
+                ${escapeHtml(sys.description)}
+              </p>
+            </div>
+
+            <!-- Tech Badges -->
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              ${(sys.tools || []).slice(0, 3).map(t => `
+                <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-950 border border-flame-orange/20 text-flame-gold font-semibold">
+                  <i class="fa-solid fa-microchip text-[9px] mr-1 text-cyan-400"></i>${escapeHtml(t.name)}
+                </span>
+              `).join('')}
+              ${(sys.tools || []).length > 3 ? `<span class="text-[10px] text-slate-400">+${(sys.tools || []).length - 3}</span>` : ''}
+            </div>
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-flame-orange/20 space-y-2.5 text-xs">
+            <div>
+              <div class="flex justify-between text-[11px] font-semibold text-slate-300 mb-1">
+                <span>Conclusão do Roadmap</span>
+                <span class="text-emerald-400 font-orbitron">${percent}%</span>
+              </div>
+              <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-flame-orange/20">
+                <div class="bg-gradient-to-r from-flame-orange to-emerald-400 h-full rounded-full transition-all duration-500" style="width: ${percent}%"></div>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] text-slate-400 pt-1">
+              <span><i class="fa-solid fa-calendar-day mr-1 text-flame-gold"></i> ${escapeHtml(sys.startDate)}</span>
+              <span class="${pendingBugs > 0 ? 'text-flame-orange font-bold' : 'text-slate-500'}">
+                <i class="fa-solid fa-bug mr-1"></i> ${pendingBugs} correções
+              </span>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* =========================================================================
+       9. CONTROLS, FILTERS & UTILITIES
+       ========================================================================= */
+    function switchView(mode) {
+      currentView = mode;
+      const cosmicView = document.getElementById('cosmicView');
+      const listView = document.getElementById('listView');
+      const mapBtn = document.getElementById('viewMapBtn');
+      const listBtn = document.getElementById('viewListBtn');
+
+      if (mode === 'map') {
+        cosmicView.classList.remove('hidden');
+        listView.classList.add('hidden');
+        mapBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 bg-flame-orange/25 text-flame-gold font-semibold transition';
+        listBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 text-slate-400 hover:text-flame-gold font-semibold transition';
+        resizeCanvas();
+      } else {
+        cosmicView.classList.add('hidden');
+        listView.classList.remove('hidden');
+        mapBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 text-slate-400 hover:text-flame-gold font-semibold transition';
+        listBtn.className = 'px-2 sm:px-2.5 py-1 rounded-lg flex items-center gap-1 bg-flame-orange/25 text-flame-gold font-semibold transition';
+        renderListView();
+      }
+      playTone(500, 0.05, 'sine');
+    }
+
+    function setFilter(galaxy) {
+      currentFilter = galaxy;
+      document.querySelectorAll('.galaxy-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === galaxy) {
+          btn.className = 'galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg transition-all bg-gradient-to-r from-flame-orange to-flame-fire text-white shadow-md font-orbitron';
+        } else {
+          btn.className = 'galaxy-filter-btn px-3 py-1 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-flame-orange/15 transition-all font-orbitron';
+        }
+      });
+      playTone(580, 0.05, 'sine');
+      renderListView();
+    }
+
+    function updateStats() {
+      document.getElementById('statTotalNodes').innerText = systems.length;
+
+      let totalDone = 0;
+      let totalBugs = 0;
+
+      systems.forEach(s => {
+        (s.roadmap || []).forEach(r => { if (r.done) totalDone++; });
+        (s.bugs || []).forEach(b => { if (!b.fixed) totalBugs++; });
+      });
+
+      document.getElementById('statCompletedTasks').innerText = totalDone;
+      document.getElementById('statPendingBugs').innerText = totalBugs;
+    }
+
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const msg = document.getElementById('toastMsg');
+      const icon = document.getElementById('toastIcon');
+
+      msg.innerText = message;
+      if (type === 'success') {
+        icon.className = 'fa-solid fa-circle-check text-emerald-400 text-base';
+      } else if (type === 'error') {
+        icon.className = 'fa-solid fa-triangle-exclamation text-rose-400 text-base';
+      } else {
+        icon.className = 'fa-solid fa-fire text-flame-gold text-base';
+      }
+
+      toast.classList.remove('translate-y-24', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-24', 'opacity-0');
+      }, 3200);
+    }
+
+    function showCustomConfirm(title, message, onConfirm) {
+      const modal = document.createElement('div');
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md';
+      modal.innerHTML = `
+        <div class="glass-flame hud-flame-corner rounded-2xl max-w-sm w-full p-6 space-y-4 border border-rose-500/50 shadow-2xl text-center">
+          <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center mx-auto text-xl border border-rose-500/40">
+            <i class="fa-solid fa-fire-burner"></i>
+          </div>
+          <div>
+            <h4 class="font-orbitron font-bold text-base text-rose-300 uppercase">${escapeHtml(title)}</h4>
+            <p class="text-xs text-slate-300 mt-1">${escapeHtml(message)}</p>
+          </div>
+          <div class="flex items-center justify-center gap-3 pt-2">
+            <button id="cancelConfirmBtn" class="px-4 py-2 rounded-xl border border-slate-700 hover:border-slate-500 text-xs font-semibold text-slate-300 transition">
+              Cancelar
+            </button>
+            <button id="okConfirmBtn" class="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-500 hover:to-rose-400 text-white font-orbitron font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-rose-500/30">
+              Confirmar
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      modal.querySelector('#cancelConfirmBtn').onclick = () => modal.remove();
+      modal.querySelector('#okConfirmBtn').onclick = () => {
+        modal.remove();
+        onConfirm();
+      };
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    /* =========================================================================
+       10. BOOTSTRAP
+       ========================================================================= */
+    window.onload = function () {
+      resizeCanvas();
+      initBackgroundStars();
+      initCloudClient();
+      loadSystems();
+      renderMultiverse();
+    };
+  </script>
+</body>
+</html>
